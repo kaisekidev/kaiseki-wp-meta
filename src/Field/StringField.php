@@ -7,7 +7,6 @@ namespace Kaiseki\WordPress\Meta\Field;
 /**
  * @phpstan-type StringFieldArray array{
  *      type: string|array{string, string},
- *      default?: string,
  *      format?: string,
  *      pattern?: string,
  *      minLength?: int,
@@ -28,11 +27,9 @@ final class StringField implements FieldInterface
         $this->default = $default;
     }
 
-    public static function create(?StringFormat $format = null, ?string $default = null): self
+    public static function create(?string $default = null): self
     {
-        $instance = new self($default);
-        $instance->format = $format;
-        return $instance;
+        return new self($default);
     }
 
     public function withFormat(StringFormat $format): self

@@ -8,7 +8,6 @@ namespace Kaiseki\WordPress\Meta\Field;
  * @phpstan-type ArrayFieldArray array{
  *      type: (string|array{string, string}),
  *      items: array<string, mixed>,
- *      default?: list<mixed>,
  *      minItems?: int,
  *      maxItems?: int,
  *      uniqueItems?: bool
@@ -25,7 +24,7 @@ final class ArrayField implements FieldInterface
     private ?bool $uniqueItems = null;
 
     /**
-     * @param list<mixed>|null $default
+     * @param list<mixed>|null $default Default value must respect type given by $arrayField
      */
     private function __construct(FieldInterface $arrayField, ?array $default = null)
     {
@@ -71,9 +70,6 @@ final class ArrayField implements FieldInterface
             'type' => $this->default === null ? [self::TYPE_NAME, 'null'] : self::TYPE_NAME,
             'items' => $this->arrayField->toArray(),
         ];
-        if ($this->default !== null) {
-            $array['default'] = $this->default;
-        }
         if ($this->minItems !== null) {
             $array['minItems'] = $this->minItems;
         }

@@ -7,7 +7,6 @@ namespace Kaiseki\WordPress\Meta\Field;
 /**
  * @phpstan-type IntegerFieldArray array{
  *      type: string|array{string, string},
- *      default?: int,
  *      minimum?: int,
  *      exclusiveMinimum?: bool,
  *      maximum?: int,
@@ -75,9 +74,7 @@ final class IntegerField implements FieldInterface
      */
     public function toArray(): array
     {
-        $array = [
-            'type' => $this->default === null ? [self::TYPE_NAME, 'null'] : self::TYPE_NAME,
-        ];
+        $array = ['type' => $this->default === null ? [self::TYPE_NAME, 'null'] : self::TYPE_NAME];
         if ($this->minimum !== null) {
             $array['minimum'] = $this->minimum;
         }

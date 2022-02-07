@@ -10,34 +10,30 @@ use function count;
  * @phpstan-type ObjectFieldArray array{
  *      type: string|array{string, string},
  *      properties: array<string, array<string, mixed>>,
- *      required?: list<string>,
- *      default?: array<string, mixed>
+ *      required?: list<string>
  * }
  */
 final class ObjectField implements FieldInterface
 {
-    private const TYPE_NAME = 'array';
+    private const TYPE_NAME = 'object';
     /** @var array<string, FieldInterface> */
     private array $properties = [];
     /** @var list<string> */
     private array $requiredFieldNames = [];
-    /** @var array<string, mixed>|null */
-    private ?array $default;
+    private bool $isNullAllowed = false;
 
-    /**
-     * @param array<string, mixed>|null $default
-     */
-    private function __construct(?array $default = null)
+    private function __construct()
     {
-        $this->default = $default;
     }
 
     /**
-     * @param array<string, mixed>|null $default
+     * @param array<string, FieldInterface> $properties Array index will be used as name for property
      */
-    public static function create(?array $default = null): self
+    public static function create(?array $properties = null): self
     {
-        return new self($default);
+        $instance = new self();
+        $instance->properties = $properties ?? [];
+        return $instance;
     }
 
     public function withAddedProperty(string $name, FieldInterface $field, bool $required = false): self
@@ -50,23 +46,25 @@ final class ObjectField implements FieldInterface
         return $clone;
     }
 
+    public function withNullAllowed(): self
+    {
+        $clone = clone $this;
+        $clone->isNullAllowed = true;
+        return $clone;
+    }
+
     /**
      * @phpstan-return ObjectFieldArray
      */
     public function toArray(): array
     {
-        $array = [
-            'type' => $this->default === null ? [self::TYPE_NAME, 'null'] : self::TYPE_NAME,
-        ];
+        $array = ['type' => $this->isNullAllowed ? [self::TYPE_NAME, 'null'] : self::TYPE_NAME];
         if (count($this->requiredFieldNames) > 0) {
             $array['required'] = $this->requiredFieldNames;
         }
         $array['properties'] = [];
         foreach ($this->properties as $name => $field) {
             $array['properties'][$name] = $field->toArray();
-        }
-        if ($this->default !== null) {
-            $array['default'] = $this->default;
         }
         return $array;
     }
@@ -76,7 +74,11 @@ final class ObjectField implements FieldInterface
      */
     public function getDefault(): ?array
     {
-        return $this->default;
+        $default = [];
+        foreach ($this->properties as $name => $field) {
+            $default[$name] = $field->getDefault();
+        }
+        return count($default) > 0 ? $default : null;
     }
 
     public function getType(): string

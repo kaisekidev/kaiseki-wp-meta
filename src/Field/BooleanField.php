@@ -6,8 +6,7 @@ namespace Kaiseki\WordPress\Meta\Field;
 
 /**
  * @phpstan-type BooleanFieldArray array{
- *      type: string|array{string, string},
- *      default: bool
+ *      type: string|array{string, string}
  * }
  */
 final class BooleanField implements FieldInterface
@@ -15,12 +14,12 @@ final class BooleanField implements FieldInterface
     private const TYPE_NAME = 'boolean';
     private bool $default;
 
-    private function __construct(bool $default = false)
+    private function __construct(bool $default)
     {
         $this->default = $default;
     }
 
-    public static function create(bool $default = false): self
+    public static function create(bool $default): self
     {
         return new self($default);
     }
@@ -32,7 +31,6 @@ final class BooleanField implements FieldInterface
     {
         return [
             'type' => self::TYPE_NAME,
-            'default' => $this->default,
         ];
     }
 

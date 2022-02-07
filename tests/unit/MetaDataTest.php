@@ -8,7 +8,7 @@ use Kaiseki\WordPress\Meta\Field\ObjectField;
 use Kaiseki\WordPress\Meta\MetaData;
 use PHPUnit\Framework\TestCase;
 
-class MetaDataTest extends TestCase
+final class MetaDataTest extends TestCase
 {
     public function testCreatingMetaDataWithFieldSetsTypeToIt(): void
     {
@@ -62,6 +62,21 @@ class MetaDataTest extends TestCase
 
         self::assertIsCallable($authCallback);
         self::assertSame($callback, $authCallback);
+    }
+
+    public function testIsSingleByDefault(): void
+    {
+        $data = MetaData::post('post_type_name', 'my_meta_key', ObjectField::create());
+
+        self::assertTrue($data->toArray()['single']);
+    }
+
+    public function testWithMultipleValuesByDefaultSetSingleToFalse(): void
+    {
+        $data = MetaData::post('post_type_name', 'my_meta_key', ObjectField::create())
+            ->withMultipleValue();
+
+        self::assertFalse($data->toArray()['single']);
     }
 
     /**
