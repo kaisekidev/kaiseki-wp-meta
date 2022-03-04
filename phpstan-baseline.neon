@@ -1,0 +1,57 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Generator expects value type array\\{callable\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface, callable\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\}, array\\{Closure\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\ArrayField, Closure\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\ArrayField\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\ArrayField\\} given\\.$#"
+			count: 3
+			path: tests/unit/Field/ArrayFieldTest.php
+
+		-
+			message: "#^Anonymous function should return Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\IntegerField but returns Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\AbstractNumericField\\<int\\>\\.$#"
+			count: 5
+			path: tests/unit/Field/IntegerFieldTest.php
+
+		-
+			message: "#^Generator expects value type array\\{callable\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface, callable\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\}, array\\{Closure\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\IntegerField, Closure\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\IntegerField\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\IntegerField\\} given\\.$#"
+			count: 5
+			path: tests/unit/Field/IntegerFieldTest.php
+
+		-
+			message: "#^Anonymous function should return Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\NumberField but returns Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\AbstractNumericField\\<float\\>\\.$#"
+			count: 5
+			path: tests/unit/Field/NumberFieldTest.php
+
+		-
+			message: "#^Generator expects value type array\\{callable\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface, callable\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\}, array\\{Closure\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\NumberField, Closure\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\NumberField\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\NumberField\\} given\\.$#"
+			count: 5
+			path: tests/unit/Field/NumberFieldTest.php
+
+		-
+			message: "#^Generator expects value type array\\{callable\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface, callable\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\}, array\\{Closure\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\ObjectField, Closure\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\ObjectField\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\ObjectField\\} given\\.$#"
+			count: 1
+			path: tests/unit/Field/ObjectFieldTest.php
+
+		-
+			message: "#^Generator expects value type array\\{callable\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface, callable\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\}, array\\{Closure\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField, Closure\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField\\} given\\.$#"
+			count: 4
+			path: tests/unit/Field/StringFieldTest.php
+
+		-
+			message: "#^Anonymous function should return Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField but returns Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\AbstractField\\<string\\>\\.$#"
+			count: 4
+			path: tests/unit/FieldTest.php
+
+		-
+			message: "#^Generator expects value type array\\{callable\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface, callable\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\}, array\\{Closure\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField, Closure\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField, false\\} given\\.$#"
+			count: 2
+			path: tests/unit/FieldTest.php
+
+		-
+			message: "#^Generator expects value type array\\{callable\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface, callable\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\}, array\\{Closure\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField, Closure\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField, true\\} given\\.$#"
+			count: 2
+			path: tests/unit/FieldTest.php
+
+		-
+			message: "#^Generator expects value type array\\{callable\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface, callable\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\FieldInterface\\}, array\\{Closure\\(\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField, Closure\\(Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField\\)\\: Kaiseki\\\\WordPress\\\\Meta\\\\Field\\\\StringField\\} given\\.$#"
+			count: 2
+			path: tests/unit/FieldTest.php
+
