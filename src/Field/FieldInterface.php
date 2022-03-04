@@ -17,4 +17,15 @@ interface FieldInterface
     public function getDefault();
 
     public function getType(): string;
+
+    public function withRequiredValue(): self;
+
+    public function withOptionalValue(): self;
+
+    public function isRequired(): bool;
+
+    /**
+     * @param mixed $value
+     */
+    public function isValidValue($value): bool;
 }

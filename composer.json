@@ -6,7 +6,7 @@
     "wordpress",
     "module"
   ],
-  "license": "proprietary",
+  "license": "MIT",
   "homepage": "https://github.com/kaisekidev/kaiseki-wp-meta",
   "authors": [
     {
@@ -87,7 +87,7 @@
     "cs-fix": "vendor/bin/phpcbf",
     "infection": "vendor/bin/infection",
     "infection-xdebug": "@composer run infection -- --initial-tests-php-options='-d zend_extension=xdebug.so'",
-    "phpstan": "vendor/bin/phpstan analyse",
+    "phpstan": "vendor/bin/phpstan analyse ",
     "phpstan-pro": "vendor/bin/phpstan analyse --pro",
     "phpunit": "vendor/bin/phpunit"
   }

@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Kaiseki\WordPress\Meta\Field;
 
+use function is_bool;
+
 /**
  * @phpstan-type BooleanFieldArray array{
  *      type: string|array{string, string}
  * }
+ * @extends AbstractField<bool>
  */
-final class BooleanField implements FieldInterface
+final class BooleanField extends AbstractField
 {
     private const TYPE_NAME = 'boolean';
-    private bool $default;
 
     private function __construct(bool $default)
     {
-        $this->default = $default;
+        parent::__construct($default);
     }
 
     public static function create(bool $default): self
@@ -24,23 +26,16 @@ final class BooleanField implements FieldInterface
         return new self($default);
     }
 
-    /**
-     * @phpstan-return BooleanFieldArray
-     */
-    public function toArray(): array
-    {
-        return [
-            'type' => self::TYPE_NAME,
-        ];
-    }
-
-    public function getDefault(): bool
-    {
-        return $this->default;
-    }
-
     public function getType(): string
     {
         return self::TYPE_NAME;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public function isValidValue($value): bool
+    {
+        return is_bool($value);
     }
 }

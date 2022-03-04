@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Kaiseki\WordPress\Meta\Field;
 
+use function gettype;
+use function is_array;
+
 /**
  * @phpstan-type ArrayFieldArray array{
  *      type: (string|array{string, string}),
@@ -12,24 +15,39 @@ namespace Kaiseki\WordPress\Meta\Field;
  *      maxItems?: int,
  *      uniqueItems?: bool
  * }
+ * @extends AbstractField<list<mixed>>
  */
-final class ArrayField implements FieldInterface
+final class ArrayField extends AbstractField
 {
     private const TYPE_NAME = 'array';
     private FieldInterface $arrayField;
-    /** @var array<int, mixed>|null */
-    private ?array $default;
     private ?int $minItems = null;
     private ?int $maxItems = null;
     private ?bool $uniqueItems = null;
 
     /**
-     * @param list<mixed>|null $default Default value must respect type given by $arrayField
+     * @param list<mixed>|null $default
      */
     private function __construct(FieldInterface $arrayField, ?array $default = null)
     {
+        parent::__construct($default);
         $this->arrayField = $arrayField;
-        $this->default = $default;
+        if ($default === null) {
+            return;
+        }
+
+        foreach ($default as $value) {
+            if ($this->arrayField->isValidValue($value)) {
+                continue;
+            }
+            throw new \InvalidArgumentException(
+                \Safe\sprintf(
+                    'ArrayField expects an array of %s, but contains %s',
+                    $this->arrayField->getType(),
+                    gettype($value)
+                )
+            );
+        }
     }
 
     /**
@@ -66,10 +84,8 @@ final class ArrayField implements FieldInterface
      */
     public function toArray(): array
     {
-        $array = [
-            'type' => $this->default === null ? [self::TYPE_NAME, 'null'] : self::TYPE_NAME,
-            'items' => $this->arrayField->toArray(),
-        ];
+        $array = parent::toArray();
+        $array['items'] = $this->arrayField->withRequiredValue()->toArray();
         if ($this->minItems !== null) {
             $array['minItems'] = $this->minItems;
         }
@@ -82,16 +98,25 @@ final class ArrayField implements FieldInterface
         return $array;
     }
 
-    /**
-     * @return list<mixed>|null
-     */
-    public function getDefault(): ?array
-    {
-        return $this->default;
-    }
-
     public function getType(): string
     {
         return self::TYPE_NAME;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public function isValidValue($value): bool
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+        foreach ($value as $item) {
+            if ($this->arrayField->isValidValue($item)) {
+                continue;
+            }
+            return false;
+        }
+        return true;
     }
 }

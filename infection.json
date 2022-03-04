@@ -3,11 +3,14 @@
   "source": {
     "directories": [
       "src"
+    ],
+    "excludes": [
+      "MetaDataRegistry.php"
     ]
   },
   "logs": {
     "text": "infection-log.txt"
   },
-  "minMsi": 94,
-  "minCoveredMsi": 94
+  "minMsi": 100,
+  "minCoveredMsi": 100
 }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Kaiseki\WordPress\Meta\Field;
 
+use function array_key_exists;
 use function count;
+use function is_array;
 
 /**
  * @phpstan-type ObjectFieldArray array{
@@ -12,19 +14,15 @@ use function count;
  *      properties: array<string, array<string, mixed>>,
  *      required?: list<string>
  * }
+ * @extends AbstractField<array<string, mixed>>
  */
-final class ObjectField implements FieldInterface
+final class ObjectField extends AbstractField
 {
     private const TYPE_NAME = 'object';
     /** @var array<string, FieldInterface> */
     private array $properties = [];
     /** @var list<string> */
     private array $requiredFieldNames = [];
-    private bool $isNullAllowed = false;
-
-    private function __construct()
-    {
-    }
 
     /**
      * @param array<string, FieldInterface> $properties Array index will be used as name for property
@@ -46,19 +44,12 @@ final class ObjectField implements FieldInterface
         return $clone;
     }
 
-    public function withNullAllowed(): self
-    {
-        $clone = clone $this;
-        $clone->isNullAllowed = true;
-        return $clone;
-    }
-
     /**
      * @phpstan-return ObjectFieldArray
      */
     public function toArray(): array
     {
-        $array = ['type' => $this->isNullAllowed ? [self::TYPE_NAME, 'null'] : self::TYPE_NAME];
+        $array = parent::toArray();
         if (count($this->requiredFieldNames) > 0) {
             $array['required'] = $this->requiredFieldNames;
         }
@@ -84,5 +75,24 @@ final class ObjectField implements FieldInterface
     public function getType(): string
     {
         return self::TYPE_NAME;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public function isValidValue($value): bool
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+        foreach ($value as $key => $arrayValue) {
+            if (!array_key_exists($key, $this->properties)) {
+                return false;
+            }
+            if (!$this->properties[$key]->isValidValue($arrayValue)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

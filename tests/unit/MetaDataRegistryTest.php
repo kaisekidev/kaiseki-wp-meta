@@ -22,7 +22,7 @@ final class MetaDataRegistryTest extends TestCase
 
         $registry->registerCallbacks();
 
-        self::assertTrue(has_action('init', [$registry, 'registerMeta']) === 10);
+        self::assertSame(10, has_action('init', [$registry, 'registerMeta']));
     }
 
     public function testRegisterMetaCallsRegisterMetaFunction(): void
