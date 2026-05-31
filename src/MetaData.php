@@ -15,7 +15,7 @@ final class MetaData
     private FieldInterface $field;
     private bool $showInRest = false;
     private bool $isSingle = true;
-    /** @var callable(): bool|null */
+    /** @var (callable(): bool)|null */
     private $authCallback = null;
 
     private function __construct(string $objectType, string $postType, string $metaKey, FieldInterface $field)
@@ -45,6 +45,7 @@ final class MetaData
     {
         $clone = clone $this;
         $clone->showInRest = true;
+
         return $clone;
     }
 
@@ -52,6 +53,7 @@ final class MetaData
     {
         $clone = clone $this;
         $clone->isSingle = false;
+
         return $clone;
     }
 
@@ -62,6 +64,7 @@ final class MetaData
     {
         $clone = clone $this;
         $clone->authCallback = $callable;
+
         return $clone;
     }
 
@@ -89,6 +92,7 @@ final class MetaData
         if ($this->authCallback !== null) {
             $array['auth_callback'] = $this->authCallback;
         }
+
         return $array;
     }
 }

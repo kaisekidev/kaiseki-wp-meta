@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Kaiseki\Test\Unit\WordPress\Meta;
+namespace Kaiseki\Test\WordPress\Meta;
 
-use Kaiseki\Test\Unit\WordPress\Meta\TestDouble\DummyMetaDataBuilder;
-use Kaiseki\Test\Unit\WordPress\Meta\TestDouble\TestContainer;
-use Kaiseki\WordPress\Config\ConfigInterface;
-use Kaiseki\WordPress\Config\NestedArrayConfig;
+use Brain\Monkey;
+use Brain\Monkey\Functions;
+use Kaiseki\Test\WordPress\Meta\TestDouble\DummyMetaDataBuilder;
+use Kaiseki\Test\WordPress\Meta\TestDouble\TestContainer;
 use Kaiseki\WordPress\Meta\Field\StringField;
 use Kaiseki\WordPress\Meta\Field\StringFormat;
 use Kaiseki\WordPress\Meta\MetaData;
@@ -21,25 +21,23 @@ final class MetaDataRegistryFactoryTest extends TestCase
 
     public function testFactory(): void
     {
-        $field = StringField::create()->withFormat(StringFormat::dateTime());
+        $field = StringField::create()->withFormat(StringFormat::DateTime);
         $expected = MetaData::post('event', 'event_start_date', $field);
         $container = new TestContainer(
             [
-                ConfigInterface::class => new NestedArrayConfig(
-                    [
-                        'meta' => [
-                            'data_builder' => [
-                                DummyMetaDataBuilder::class,
-                            ],
+                'config' => [
+                    'meta' => [
+                        'data_builder' => [
+                            DummyMetaDataBuilder::class,
                         ],
-                    ]
-                ),
+                    ],
+                ],
                 DummyMetaDataBuilder::class => new DummyMetaDataBuilder([$expected]),
             ]
         );
         $instance = (new MetaDataRegistryFactory())($container);
 
-        \Brain\Monkey\Functions\expect('register_meta')->with(
+        Functions\expect('register_meta')->once()->with(
             $expected->getObjectType(),
             $expected->getMetaKey(),
             $expected->toArray()
@@ -51,12 +49,12 @@ final class MetaDataRegistryFactoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        \Brain\Monkey\setUp();
+        Monkey\setUp();
     }
 
     protected function tearDown(): void
     {
+        Monkey\tearDown();
         parent::tearDown();
-        \Brain\Monkey\tearDown();
     }
 }

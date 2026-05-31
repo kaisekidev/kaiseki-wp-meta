@@ -2,41 +2,42 @@
 
 declare(strict_types=1);
 
-namespace Kaiseki\Test\Unit\WordPress\Meta\Field;
+namespace Kaiseki\Test\WordPress\Meta\Field;
 
+use Kaiseki\WordPress\Meta\Field\FieldInterface;
 use Kaiseki\WordPress\Meta\Field\StringField;
 use Kaiseki\WordPress\Meta\Field\StringFormat;
 
-final class StringFieldTest extends AbstractFieldTest
+final class StringFieldTest extends AbstractFieldTestCase
 {
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, mixed}>
      */
-    public function getDefaultIsExpectedValueCases(): iterable
+    public static function getDefaultIsExpectedValueCases(): iterable
     {
         yield 'StringField' => [fn(): StringField => StringField::create('foo'), 'foo'];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, string}>
      */
-    public function getTypeIsExpectedTypeCases(): iterable
+    public static function getTypeIsExpectedTypeCases(): iterable
     {
         yield 'StringField' => [fn(): StringField => StringField::create(), 'string'];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface}>
      */
-    public function getDefaultIsNullCases(): iterable
+    public static function getDefaultIsNullCases(): iterable
     {
         yield 'StringField' => [fn(): StringField => StringField::create()];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, string, mixed}>
      */
-    public function getToArrayCases(): iterable
+    public static function getToArrayCases(): iterable
     {
         yield 'string type with default' => [
             fn(): StringField => StringField::create('foo'),
@@ -49,9 +50,9 @@ final class StringFieldTest extends AbstractFieldTest
             ['string', 'null'],
         ];
         yield 'string format' => [
-            fn(): StringField => StringField::create()->withFormat(StringFormat::dateTime()),
+            fn(): StringField => StringField::create()->withFormat(StringFormat::DateTime),
             'format',
-            (string)StringFormat::dateTime(),
+            StringFormat::DateTime->value,
         ];
         yield 'string maxLength' => [
             fn(): StringField => StringField::create()->withMaxLength(10),
@@ -71,21 +72,21 @@ final class StringFieldTest extends AbstractFieldTest
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, callable}>
      */
-    public function getFieldClonesCases(): iterable
+    public static function getFieldClonesCases(): iterable
     {
         $create = static fn(): StringField => StringField::create();
         yield 'withPattern' => [$create, fn(StringField $field): StringField => $field->withPattern('^[a-z]{1,5}$')];
-        yield 'withFormat' => [$create, fn(StringField $field): StringField => $field->withFormat(StringFormat::ip())];
+        yield 'withFormat' => [$create, fn(StringField $field): StringField => $field->withFormat(StringFormat::Ip)];
         yield 'withMinLength' => [$create, fn(StringField $field): StringField => $field->withMinLength(3)];
         yield 'withMaxLength' => [$create, fn(StringField $field): StringField => $field->withMaxLength(10)];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, mixed, bool}>
      */
-    public function getIsValidValueCases(): iterable
+    public static function getIsValidValueCases(): iterable
     {
         yield 'valid string' => [fn(): StringField => StringField::create(), 'foo', true];
         yield 'invalid string' => [fn(): StringField => StringField::create(), 1, false];

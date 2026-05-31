@@ -2,41 +2,43 @@
 
 declare(strict_types=1);
 
-namespace Kaiseki\Test\Unit\WordPress\Meta\Field;
+namespace Kaiseki\Test\WordPress\Meta\Field;
 
+use InvalidArgumentException;
 use Kaiseki\WordPress\Meta\Field\ArrayField;
+use Kaiseki\WordPress\Meta\Field\FieldInterface;
 use Kaiseki\WordPress\Meta\Field\IntegerField;
 
-final class ArrayFieldTest extends AbstractFieldTest
+final class ArrayFieldTest extends AbstractFieldTestCase
 {
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, mixed}>
      */
-    public function getDefaultIsExpectedValueCases(): iterable
+    public static function getDefaultIsExpectedValueCases(): iterable
     {
         yield 'ArrayField' => [fn(): ArrayField => ArrayField::create(IntegerField::create(), [1, 2, 3]), [1, 2, 3]];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, string}>
      */
-    public function getTypeIsExpectedTypeCases(): iterable
+    public static function getTypeIsExpectedTypeCases(): iterable
     {
         yield 'ArrayField' => [fn(): ArrayField => ArrayField::create(IntegerField::create()), 'array'];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface}>
      */
-    public function getDefaultIsNullCases(): iterable
+    public static function getDefaultIsNullCases(): iterable
     {
         yield 'ArrayField' => [fn(): ArrayField => ArrayField::create(IntegerField::create())];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, string, mixed}>
      */
-    public function getToArrayCases(): iterable
+    public static function getToArrayCases(): iterable
     {
         yield 'array type with default' => [
             fn(): ArrayField => ArrayField::create(IntegerField::create(), [1, 2, 3]),
@@ -71,9 +73,9 @@ final class ArrayFieldTest extends AbstractFieldTest
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, callable}>
      */
-    public function getFieldClonesCases(): iterable
+    public static function getFieldClonesCases(): iterable
     {
         $create = static fn(): ArrayField => ArrayField::create(IntegerField::create());
         yield 'withUniqueItems' => [$create, fn(ArrayField $field): ArrayField => $field->withUniqueItems()];
@@ -82,9 +84,9 @@ final class ArrayFieldTest extends AbstractFieldTest
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, mixed, bool}>
      */
-    public function getIsValidValueCases(): iterable
+    public static function getIsValidValueCases(): iterable
     {
         yield 'invalid not array' => [fn(): ArrayField => ArrayField::create(IntegerField::create()), 1, false];
         yield 'valid integer' => [fn(): ArrayField => ArrayField::create(IntegerField::create()), [1], true];
@@ -93,7 +95,7 @@ final class ArrayFieldTest extends AbstractFieldTest
 
     public function testThrowsExceptionWithInvalidDefault(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('ArrayField expects an array of integer, but contains string');
 
         ArrayField::create(IntegerField::create(), [1, '1']);

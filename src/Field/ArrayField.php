@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Kaiseki\WordPress\Meta\Field;
 
+use InvalidArgumentException;
+
 use function gettype;
 use function is_array;
+use function sprintf;
 
 /**
  * @phpstan-type ArrayFieldArray array{
@@ -15,7 +18,6 @@ use function is_array;
  *      maxItems?: int,
  *      uniqueItems?: bool
  * }
- * @extends AbstractField<list<mixed>>
  */
 final class ArrayField extends AbstractField
 {
@@ -26,6 +28,7 @@ final class ArrayField extends AbstractField
     private ?bool $uniqueItems = null;
 
     /**
+     * @param FieldInterface   $arrayField
      * @param list<mixed>|null $default
      */
     private function __construct(FieldInterface $arrayField, ?array $default = null)
@@ -40,8 +43,9 @@ final class ArrayField extends AbstractField
             if ($this->arrayField->isValidValue($value)) {
                 continue;
             }
-            throw new \InvalidArgumentException(
-                \Safe\sprintf(
+
+            throw new InvalidArgumentException(
+                sprintf(
                     'ArrayField expects an array of %s, but contains %s',
                     $this->arrayField->getType(),
                     gettype($value)
@@ -51,6 +55,7 @@ final class ArrayField extends AbstractField
     }
 
     /**
+     * @param FieldInterface   $arrayField
      * @param list<mixed>|null $default
      */
     public static function create(FieldInterface $arrayField, ?array $default = null): self
@@ -62,6 +67,7 @@ final class ArrayField extends AbstractField
     {
         $new = clone $this;
         $new->minItems = $minItems;
+
         return $new;
     }
 
@@ -69,6 +75,7 @@ final class ArrayField extends AbstractField
     {
         $new = clone $this;
         $new->maxItems = $maxItems;
+
         return $new;
     }
 
@@ -76,6 +83,7 @@ final class ArrayField extends AbstractField
     {
         $new = clone $this;
         $new->uniqueItems = true;
+
         return $new;
     }
 
@@ -95,6 +103,7 @@ final class ArrayField extends AbstractField
         if ($this->uniqueItems !== null) {
             $array['uniqueItems'] = $this->uniqueItems;
         }
+
         return $array;
     }
 
@@ -103,10 +112,7 @@ final class ArrayField extends AbstractField
         return self::TYPE_NAME;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function isValidValue($value): bool
+    public function isValidValue(mixed $value): bool
     {
         if (!is_array($value)) {
             return false;
@@ -115,8 +121,10 @@ final class ArrayField extends AbstractField
             if ($this->arrayField->isValidValue($item)) {
                 continue;
             }
+
             return false;
         }
+
         return true;
     }
 }

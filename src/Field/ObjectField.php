@@ -14,7 +14,6 @@ use function is_array;
  *      properties: array<string, array<string, mixed>>,
  *      required?: list<string>
  * }
- * @extends AbstractField<array<string, mixed>>
  */
 final class ObjectField extends AbstractField
 {
@@ -25,12 +24,13 @@ final class ObjectField extends AbstractField
     private array $requiredFieldNames = [];
 
     /**
-     * @param array<string, FieldInterface> $properties Array index will be used as name for property
+     * @param array<string, FieldInterface>|null $properties Array index will be used as name for property
      */
     public static function create(?array $properties = null): self
     {
         $instance = new self();
         $instance->properties = $properties ?? [];
+
         return $instance;
     }
 
@@ -41,6 +41,7 @@ final class ObjectField extends AbstractField
         if ($required) {
             $clone->requiredFieldNames[] = $name;
         }
+
         return $clone;
     }
 
@@ -57,6 +58,7 @@ final class ObjectField extends AbstractField
         foreach ($this->properties as $name => $field) {
             $array['properties'][$name] = $field->toArray();
         }
+
         return $array;
     }
 
@@ -69,6 +71,7 @@ final class ObjectField extends AbstractField
         foreach ($this->properties as $name => $field) {
             $default[$name] = $field->getDefault();
         }
+
         return count($default) > 0 ? $default : null;
     }
 
@@ -77,10 +80,7 @@ final class ObjectField extends AbstractField
         return self::TYPE_NAME;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function isValidValue($value): bool
+    public function isValidValue(mixed $value): bool
     {
         if (!is_array($value)) {
             return false;
@@ -93,6 +93,7 @@ final class ObjectField extends AbstractField
                 return false;
             }
         }
+
         return true;
     }
 }

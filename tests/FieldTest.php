@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Kaiseki\Test\Unit\WordPress\Meta;
+namespace Kaiseki\Test\WordPress\Meta;
 
-use Kaiseki\WordPress\Meta\Field\FieldInterface;
 use Kaiseki\WordPress\Meta\Field\StringField;
 use PHPUnit\Framework\TestCase;
 
@@ -12,8 +11,10 @@ final class FieldTest extends TestCase
 {
     /**
      * @dataProvider getFieldIsRequiredCases
-     * @param callable(): FieldInterface $create
-     * @param callable(FieldInterface): FieldInterface $modify
+     *
+     * @param callable(): StringField            $create
+     * @param callable(StringField): StringField $modify
+     * @param bool                               $expected
      */
     public function testFieldIsRequired(callable $create, callable $modify, bool $expected): void
     {
@@ -25,9 +26,9 @@ final class FieldTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{callable(): FieldInterface, callable(FieldInterface): FieldInterface}>
+     * @return iterable<string, array{callable(): StringField, callable(StringField): StringField, bool}>
      */
-    public function getFieldIsRequiredCases(): iterable
+    public static function getFieldIsRequiredCases(): iterable
     {
         yield 'with default is required' => [
             fn(): StringField => StringField::create('test'),
@@ -53,8 +54,9 @@ final class FieldTest extends TestCase
 
     /**
      * @dataProvider getFieldClonesCases
-     * @param callable(): FieldInterface $create
-     * @param callable(FieldInterface): FieldInterface $modify
+     *
+     * @param callable(): StringField            $create
+     * @param callable(StringField): StringField $modify
      */
     public function testFieldClones(callable $create, callable $modify): void
     {
@@ -66,9 +68,9 @@ final class FieldTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{callable(): FieldInterface, callable(FieldInterface): FieldInterface}>
+     * @return iterable<string, array{callable(): StringField, callable(StringField): StringField}>
      */
-    public function getFieldClonesCases(): iterable
+    public static function getFieldClonesCases(): iterable
     {
         yield 'withRequiredValue' => [
             fn(): StringField => StringField::create(),

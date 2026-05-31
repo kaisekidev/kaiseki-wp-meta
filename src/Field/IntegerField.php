@@ -23,10 +23,7 @@ final class IntegerField extends AbstractNumericField
         return self::TYPE_NAME;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function isValidValue($value): bool
+    public function isValidValue(mixed $value): bool
     {
         return is_int($value);
     }

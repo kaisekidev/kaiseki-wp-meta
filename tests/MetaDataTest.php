@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kaiseki\Test\Unit\WordPress\Meta;
+namespace Kaiseki\Test\WordPress\Meta;
 
+use DateTimeImmutable;
 use Kaiseki\WordPress\Meta\Field\ArrayField;
 use Kaiseki\WordPress\Meta\Field\BooleanField;
 use Kaiseki\WordPress\Meta\Field\IntegerField;
@@ -12,7 +13,6 @@ use Kaiseki\WordPress\Meta\Field\StringField;
 use Kaiseki\WordPress\Meta\Field\StringFormat;
 use Kaiseki\WordPress\Meta\MetaData;
 use PHPUnit\Framework\TestCase;
-use Safe\DateTimeImmutable;
 
 final class MetaDataTest extends TestCase
 {
@@ -60,7 +60,7 @@ final class MetaDataTest extends TestCase
 
     public function testAuthCallbackIs(): void
     {
-        $callback = fn (): bool => true;
+        $callback = fn(): bool => true;
         $data = MetaData::post('post_type_name', 'my_meta_key', ObjectField::create())
             ->withAuthCallback($callback);
 
@@ -87,6 +87,7 @@ final class MetaDataTest extends TestCase
 
     /**
      * @dataProvider metaDataClonesCases
+     *
      * @param callable(MetaData): MetaData $modify
      */
     public function testMetaDataClones(callable $modify): void
@@ -101,7 +102,7 @@ final class MetaDataTest extends TestCase
     /**
      * @return iterable<string, array{callable(MetaData): MetaData}>
      */
-    public function metaDataClonesCases(): iterable
+    public static function metaDataClonesCases(): iterable
     {
         $cb = fn(): bool => true;
         yield 'showInRest' => [fn(MetaData $data): MetaData => $data->withShowInRest()];
@@ -114,8 +115,8 @@ final class MetaDataTest extends TestCase
         $nextDecember = (new DateTimeImmutable('1st december'))->format('Y-m-d H:i:s');
         $today = (new DateTimeImmutable())->format('Y-m-d H:i:s');
         $redirectUrl = 'https://www.kaiseki.dev';
-        $authCallback = fn(): bool => current_user_can('edit_posts');
-        $dateFormat = StringFormat::dateTime();
+        $authCallback = fn(): bool => true;
+        $dateFormat = StringFormat::DateTime;
 
         $data = MetaData::post(
             'advent_calendar_post_type',
@@ -124,7 +125,7 @@ final class MetaDataTest extends TestCase
                 ->withAddedProperty('door_count', IntegerField::create(24)->withMinimum(1))
                 ->withAddedProperty('door_ids', ArrayField::create(IntegerField::create(), []))
                 ->withAddedProperty('door_permalink_prefix', StringField::create('day-'))
-                ->withAddedProperty('redirect_url', StringField::create($redirectUrl)->withFormat(StringFormat::uri()))
+                ->withAddedProperty('redirect_url', StringField::create($redirectUrl)->withFormat(StringFormat::Uri))
                 ->withAddedProperty(
                     'settings',
                     ObjectField::create()
@@ -157,12 +158,12 @@ final class MetaDataTest extends TestCase
                     'redirect_url' => $redirectUrl,
                     'settings' => [
                         'hide_future_door_images' => false,
-                        'hide_door_numbers'       => false,
-                        'leave_past_doors_open'   => false,
-                        'make_today_door_large'   => false,
-                        'make_today_door_first'   => false,
-                        'open_all_doors'          => false,
-                        'randomize_door_order'    => false,
+                        'hide_door_numbers' => false,
+                        'leave_past_doors_open' => false,
+                        'make_today_door_large' => false,
+                        'make_today_door_first' => false,
+                        'open_all_doors' => false,
+                        'randomize_door_order' => false,
                     ],
                     'has_finished_setup' => false,
                     'has_activated_simulation_date' => false,
@@ -172,35 +173,35 @@ final class MetaDataTest extends TestCase
                 'type' => 'object',
                 'show_in_rest' => [
                     'schema' => [
-                        'type'  => 'object',
+                        'type' => 'object',
                         'properties' => [
                             'door_count' => [
                                 'type' => 'integer',
                                 'minimum' => 1,
                             ],
                             'door_ids' => [
-                                'type'  => 'array',
+                                'type' => 'array',
                                 'items' => [
                                     'type' => 'integer',
                                 ],
                             ],
                             'door_permalink_prefix' => [
-                                'type'  => 'string',
+                                'type' => 'string',
                             ],
                             'redirect_url' => [
-                                'type'  => 'string',
+                                'type' => 'string',
                                 'format' => 'uri',
                             ],
                             'settings' => [
                                 'type' => 'object',
                                 'properties' => [
                                     'hide_future_door_images' => ['type' => 'boolean'],
-                                    'hide_door_numbers'       => ['type' => 'boolean'],
-                                    'leave_past_doors_open'   => ['type' => 'boolean'],
-                                    'make_today_door_large'   => ['type' => 'boolean'],
-                                    'make_today_door_first'   => ['type' => 'boolean'],
-                                    'open_all_doors'          => ['type' => 'boolean'],
-                                    'randomize_door_order'    => ['type' => 'boolean'],
+                                    'hide_door_numbers' => ['type' => 'boolean'],
+                                    'leave_past_doors_open' => ['type' => 'boolean'],
+                                    'make_today_door_large' => ['type' => 'boolean'],
+                                    'make_today_door_first' => ['type' => 'boolean'],
+                                    'open_all_doors' => ['type' => 'boolean'],
+                                    'randomize_door_order' => ['type' => 'boolean'],
                                 ],
                             ],
                             'has_finished_setup' => [
@@ -208,11 +209,11 @@ final class MetaDataTest extends TestCase
                             ],
                             'has_activated_simulation_date' => ['type' => 'boolean'],
                             'calendar_simulation_date' => [
-                                'type'  => 'string',
+                                'type' => 'string',
                                 'format' => 'date-time',
                             ],
                             'calendar_start_date' => [
-                                'type'  => 'string',
+                                'type' => 'string',
                                 'format' => 'date-time',
                             ],
                         ],

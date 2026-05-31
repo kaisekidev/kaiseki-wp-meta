@@ -4,50 +4,36 @@ declare(strict_types=1);
 
 namespace Kaiseki\WordPress\Meta\Field;
 
-/**
- * @template T
- */
 abstract class AbstractField implements FieldInterface
 {
     private const NULLABLE_TYPE = 'null';
     private bool $isRequired;
-    /** @var T|null */
-    private $default;
+    private mixed $default;
 
-    /**
-     * @param T|null $default
-     */
-    protected function __construct($default = null)
+    protected function __construct(mixed $default = null)
     {
         $this->isRequired = $default !== null;
         $this->default = $default;
     }
 
-    /**
-     * @return T|null
-     */
-    public function getDefault()
+    public function getDefault(): mixed
     {
         return $this->default;
     }
 
-    /**
-     * @return self<T>
-     */
-    public function withRequiredValue(): self
+    public function withRequiredValue(): static
     {
         $clone = clone $this;
         $clone->isRequired = true;
+
         return $clone;
     }
 
-    /**
-     * @return self<T>
-     */
-    public function withOptionalValue(): self
+    public function withOptionalValue(): static
     {
         $clone = clone $this;
         $clone->isRequired = false;
+
         return $clone;
     }
 
@@ -57,7 +43,7 @@ abstract class AbstractField implements FieldInterface
     }
 
     /**
-     * @return array{type: string|array{string, string}}
+     * @return array{type: array{string, string}|string}
      */
     public function toArray(): array
     {

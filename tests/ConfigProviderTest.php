@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kaiseki\Test\Unit\WordPress\Meta;
+namespace Kaiseki\Test\WordPress\Meta;
 
 use Kaiseki\WordPress\Meta\ConfigProvider;
 use Kaiseki\WordPress\Meta\MetaDataRegistry;

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Kaiseki\WordPress\Meta;
 
-use Kaiseki\WordPress\Hook\HookCallbackProviderInterface;
+use Kaiseki\WordPress\Hook\HookProviderInterface;
 
 use function add_action;
 use function register_meta;
 
-final class MetaDataRegistry implements HookCallbackProviderInterface
+final class MetaDataRegistry implements HookProviderInterface
 {
     /** @var list<MetaDataBuilderInterface> */
     private array $builder;
@@ -22,7 +22,7 @@ final class MetaDataRegistry implements HookCallbackProviderInterface
         $this->builder = $builder;
     }
 
-    public function registerCallbacks(): void
+    public function addHooks(): void
     {
         add_action('init', [$this, 'registerMeta']);
     }

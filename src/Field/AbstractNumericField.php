@@ -5,78 +5,74 @@ declare(strict_types=1);
 namespace Kaiseki\WordPress\Meta\Field;
 
 /**
+ * @template T of int|float
+ *
  * @phpstan-type NumericFieldArray array{
  *      type: string|array{string, string},
- *      minimum?: T,
+ *      minimum?: int|float,
  *      exclusiveMinimum?: bool,
- *      maximum?: T,
+ *      maximum?: int|float,
  *      exclusiveMaximum?: bool,
- *      multipleOf?: T
+ *      multipleOf?: int|float
  * }
- * @template T
- * @extends AbstractField<T>
  */
 abstract class AbstractNumericField extends AbstractField
 {
     /** @var T|null */
-    private $minimum = null;
+    private int|float|null $minimum = null;
     private ?bool $exclusiveMinimum = null;
     /** @var T|null */
-    private $maximum = null;
+    private int|float|null $maximum = null;
     private ?bool $exclusiveMaximum = null;
     /** @var T|null */
-    private $multipleOf = null;
+    private int|float|null $multipleOf = null;
 
     /**
      * @param T $minimum
-     * @return self<T>
      */
-    public function withMinimum($minimum): self
+    public function withMinimum(int|float $minimum): static
     {
         $new = clone $this;
         $new->minimum = $minimum;
+
         return $new;
     }
 
-    /**
-     * @return self<T>
-     */
-    public function withExcludedMinimum(): self
+    public function withExcludedMinimum(): static
     {
         $new = clone $this;
         $new->exclusiveMinimum = true;
+
         return $new;
     }
 
     /**
      * @param T $maximum
-     * @return self<T>
      */
-    public function withMaximum($maximum): self
+    public function withMaximum(int|float $maximum): static
     {
         $new = clone $this;
         $new->maximum = $maximum;
+
         return $new;
     }
 
-    /**
-     * @return self<T>
-     */
-    public function withExcludedMaximum(): self
+    public function withExcludedMaximum(): static
     {
         $new = clone $this;
         $new->exclusiveMaximum = true;
+
         return $new;
     }
 
     /**
      * @param T $multipleOf
-     * @return self<T>
      */
-    public function withMultipleOf($multipleOf): self
+    public function withMultipleOf(int|float $multipleOf): static
     {
         $new = clone $this;
         $new->multipleOf = $multipleOf;
+
         return $new;
     }
 
@@ -101,6 +97,7 @@ abstract class AbstractNumericField extends AbstractField
         if ($this->multipleOf !== null) {
             $array['multipleOf'] = $this->multipleOf;
         }
+
         return $array;
     }
 }

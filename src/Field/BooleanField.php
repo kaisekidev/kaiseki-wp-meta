@@ -10,7 +10,6 @@ use function is_bool;
  * @phpstan-type BooleanFieldArray array{
  *      type: string|array{string, string}
  * }
- * @extends AbstractField<bool>
  */
 final class BooleanField extends AbstractField
 {
@@ -31,10 +30,7 @@ final class BooleanField extends AbstractField
         return self::TYPE_NAME;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function isValidValue($value): bool
+    public function isValidValue(mixed $value): bool
     {
         return is_bool($value);
     }

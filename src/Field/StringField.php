@@ -14,7 +14,6 @@ use function is_string;
  *      minLength?: int,
  *      maxLength?: int
  * }
- * @extends AbstractField<string>
  */
 final class StringField extends AbstractField
 {
@@ -33,6 +32,7 @@ final class StringField extends AbstractField
     {
         $clone = clone $this;
         $clone->format = $format;
+
         return $clone;
     }
 
@@ -40,6 +40,7 @@ final class StringField extends AbstractField
     {
         $clone = clone $this;
         $clone->pattern = $pattern;
+
         return $clone;
     }
 
@@ -47,6 +48,7 @@ final class StringField extends AbstractField
     {
         $clone = clone $this;
         $clone->minLength = $minLength;
+
         return $clone;
     }
 
@@ -54,6 +56,7 @@ final class StringField extends AbstractField
     {
         $clone = clone $this;
         $clone->maxLength = $maxLength;
+
         return $clone;
     }
 
@@ -64,7 +67,7 @@ final class StringField extends AbstractField
     {
         $array = parent::toArray();
         if ($this->format !== null) {
-            $array['format'] = (string)$this->format;
+            $array['format'] = $this->format->value;
         }
         if ($this->pattern !== null) {
             $array['pattern'] = $this->pattern;
@@ -75,6 +78,7 @@ final class StringField extends AbstractField
         if ($this->maxLength !== null) {
             $array['maxLength'] = $this->maxLength;
         }
+
         return $array;
     }
 
@@ -83,10 +87,7 @@ final class StringField extends AbstractField
         return self::TYPE_NAME;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function isValidValue($value): bool
+    public function isValidValue(mixed $value): bool
     {
         return is_string($value);
     }

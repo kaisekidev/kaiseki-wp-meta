@@ -2,22 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Kaiseki\Test\Unit\WordPress\Meta\Field;
+namespace Kaiseki\Test\WordPress\Meta\Field;
 
 use Kaiseki\WordPress\Meta\Field\AbstractField;
 use Kaiseki\WordPress\Meta\Field\ArrayField;
 use Kaiseki\WordPress\Meta\Field\BooleanField;
+use Kaiseki\WordPress\Meta\Field\FieldInterface;
 use Kaiseki\WordPress\Meta\Field\IntegerField;
 use Kaiseki\WordPress\Meta\Field\NumberField;
 use Kaiseki\WordPress\Meta\Field\ObjectField;
 use Kaiseki\WordPress\Meta\Field\StringField;
 
-final class ObjectFieldTest extends AbstractFieldTest
+final class ObjectFieldTest extends AbstractFieldTestCase
 {
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, mixed}>
      */
-    public function getDefaultIsExpectedValueCases(): iterable
+    public static function getDefaultIsExpectedValueCases(): iterable
     {
         yield 'ObjectField' => [
             fn(): ObjectField => ObjectField::create(
@@ -33,25 +34,25 @@ final class ObjectFieldTest extends AbstractFieldTest
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, string}>
      */
-    public function getTypeIsExpectedTypeCases(): iterable
+    public static function getTypeIsExpectedTypeCases(): iterable
     {
         yield 'ObjectField' => [fn(): ObjectField => ObjectField::create(), 'object'];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface}>
      */
-    public function getDefaultIsNullCases(): iterable
+    public static function getDefaultIsNullCases(): iterable
     {
         yield 'ObjectField' => [fn(): ObjectField => ObjectField::create()];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, string, mixed}>
      */
-    public function getToArrayCases(): iterable
+    public static function getToArrayCases(): iterable
     {
         yield 'object type' => [
             fn(): AbstractField => ObjectField::create()->withRequiredValue(),
@@ -76,9 +77,9 @@ final class ObjectFieldTest extends AbstractFieldTest
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, callable}>
      */
-    public function getFieldClonesCases(): iterable
+    public static function getFieldClonesCases(): iterable
     {
         yield 'withAddedProperty' => [
             static fn(): ObjectField => ObjectField::create(),
@@ -87,9 +88,9 @@ final class ObjectFieldTest extends AbstractFieldTest
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, mixed, bool}>
      */
-    public function getIsValidValueCases(): iterable
+    public static function getIsValidValueCases(): iterable
     {
         yield 'valid object' => [
             fn(): ObjectField => ObjectField::create(['foo' => StringField::create()]),

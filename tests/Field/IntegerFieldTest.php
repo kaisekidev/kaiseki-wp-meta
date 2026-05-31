@@ -2,41 +2,42 @@
 
 declare(strict_types=1);
 
-namespace Kaiseki\Test\Unit\WordPress\Meta\Field;
+namespace Kaiseki\Test\WordPress\Meta\Field;
 
 use Kaiseki\WordPress\Meta\Field\AbstractNumericField;
+use Kaiseki\WordPress\Meta\Field\FieldInterface;
 use Kaiseki\WordPress\Meta\Field\IntegerField;
 
-final class IntegerFieldTest extends AbstractFieldTest
+final class IntegerFieldTest extends AbstractFieldTestCase
 {
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, mixed}>
      */
-    public function getDefaultIsExpectedValueCases(): iterable
+    public static function getDefaultIsExpectedValueCases(): iterable
     {
         yield 'IntegerField' => [fn(): IntegerField => IntegerField::create(2), 2];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, string}>
      */
-    public function getTypeIsExpectedTypeCases(): iterable
+    public static function getTypeIsExpectedTypeCases(): iterable
     {
         yield 'IntegerField' => [fn(): IntegerField => IntegerField::create(), 'integer'];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface}>
      */
-    public function getDefaultIsNullCases(): iterable
+    public static function getDefaultIsNullCases(): iterable
     {
         yield 'IntegerField' => [fn(): IntegerField => IntegerField::create()];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, string, mixed}>
      */
-    public function getToArrayCases(): iterable
+    public static function getToArrayCases(): iterable
     {
         yield 'integer type with default' => [
             fn(): IntegerField => IntegerField::create(1),
@@ -76,37 +77,22 @@ final class IntegerFieldTest extends AbstractFieldTest
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, callable}>
      */
-    public function getFieldClonesCases(): iterable
+    public static function getFieldClonesCases(): iterable
     {
         $create = static fn(): IntegerField => IntegerField::create();
-        yield 'withMinimum' => [
-            $create,
-            fn(IntegerField $field): IntegerField => $field->withMinimum(1),
-        ];
-        yield 'withExcludedMinimum' => [
-            $create,
-            fn(IntegerField $field): IntegerField => $field->withExcludedMinimum(),
-        ];
-        yield 'withMaximum' => [
-            $create,
-            fn(IntegerField $field): IntegerField => $field->withMaximum(10),
-        ];
-        yield 'withExcludedMaximum' => [
-            $create,
-            fn(IntegerField $field): IntegerField => $field->withExcludedMaximum(),
-        ];
-        yield 'withMultipleOf' => [
-            $create,
-            fn(IntegerField $field): IntegerField => $field->withMultipleOf(2),
-        ];
+        yield 'withMinimum' => [$create, fn(IntegerField $field): IntegerField => $field->withMinimum(1)];
+        yield 'withExcludedMinimum' => [$create, fn(IntegerField $field): IntegerField => $field->withExcludedMinimum()];
+        yield 'withMaximum' => [$create, fn(IntegerField $field): IntegerField => $field->withMaximum(10)];
+        yield 'withExcludedMaximum' => [$create, fn(IntegerField $field): IntegerField => $field->withExcludedMaximum()];
+        yield 'withMultipleOf' => [$create, fn(IntegerField $field): IntegerField => $field->withMultipleOf(2)];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable<string, array{callable(): FieldInterface, mixed, bool}>
      */
-    public function getIsValidValueCases(): iterable
+    public static function getIsValidValueCases(): iterable
     {
         yield 'valid integer' => [fn(): IntegerField => IntegerField::create(), 1, true];
         yield 'invalid integer' => [fn(): IntegerField => IntegerField::create(), '1', false];

@@ -11,10 +11,7 @@ interface FieldInterface
      */
     public function toArray(): array;
 
-    /**
-     * @return mixed
-     */
-    public function getDefault();
+    public function getDefault(): mixed;
 
     public function getType(): string;
 
@@ -24,8 +21,5 @@ interface FieldInterface
 
     public function isRequired(): bool;
 
-    /**
-     * @param mixed $value
-     */
-    public function isValidValue($value): bool;
+    public function isValidValue(mixed $value): bool;
 }
