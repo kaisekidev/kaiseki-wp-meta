@@ -1,18 +1,21 @@
 {
-  "symbol-whitelist": [
-    "null", "true", "false",
-    "static", "self", "parent",
-    "array", "string", "int", "float", "bool", "iterable", "callable", "void", "object",
-    "add_action", "register_meta"
-  ],
-  "php-core-extensions": [
-    "Core",
-    "date",
-    "pcre",
-    "Phar",
-    "Reflection",
-    "SPL",
-    "standard"
-  ],
-  "scan-files": []
+    "symbol-whitelist": [
+        "null", "true", "false",
+        "static", "self", "parent",
+        "array", "string", "int", "float", "bool", "iterable", "callable", "void", "object", "mixed", "never",
+        "add_action",
+        "add_filter",
+        "remove_action",
+        "remove_filter",
+        "do_action",
+        "apply_filters",
+        "register_meta"
+    ],
+    "php-core-extensions": [
+        "Core",
+        "standard",
+        "pcre",
+        "SPL",
+        "json"
+    ]
 }
