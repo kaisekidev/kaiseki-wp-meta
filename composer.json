@@ -1,7 +1,7 @@
 {
   "name": "kaiseki/wp-meta",
   "type": "library",
-  "description": "Provides a fluent DSL to register WordPress post meta.",
+  "description": "Fluent, type-safe DSL for registering WordPress meta.",
   "keywords": [
     "wordpress",
     "module"
