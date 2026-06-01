@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Kaiseki\WordPress\Meta\Field;
 
-use function is_string;
-
 /**
  * @phpstan-type StringFieldArray array{
  *      type: string|array{string, string},
@@ -85,10 +83,5 @@ final class StringField extends AbstractField
     public function getType(): string
     {
         return self::TYPE_NAME;
-    }
-
-    public function isValidValue(mixed $value): bool
-    {
-        return is_string($value);
     }
 }

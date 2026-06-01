@@ -4,224 +4,134 @@ declare(strict_types=1);
 
 namespace Kaiseki\Test\WordPress\Meta;
 
-use DateTimeImmutable;
-use Kaiseki\WordPress\Meta\Field\ArrayField;
-use Kaiseki\WordPress\Meta\Field\BooleanField;
 use Kaiseki\WordPress\Meta\Field\IntegerField;
-use Kaiseki\WordPress\Meta\Field\ObjectField;
 use Kaiseki\WordPress\Meta\Field\StringField;
-use Kaiseki\WordPress\Meta\Field\StringFormat;
 use Kaiseki\WordPress\Meta\MetaData;
 use PHPUnit\Framework\TestCase;
 
 final class MetaDataTest extends TestCase
 {
-    public function testCreatingMetaDataWithFieldSetsTypeToIt(): void
+    public function testPostCreatesMetaData(): void
     {
-        $expected = ObjectField::create();
-        $data = MetaData::post('post_type_name', 'my_meta_key', $expected);
+        $metaData = MetaData::post('page', 'my_key', StringField::create());
+        $result = $metaData->toArray();
 
-        self::assertSame($expected->getType(), $data->toArray()['type']);
+        self::assertSame('post', $metaData->getObjectType());
+        self::assertSame('my_key', $metaData->getMetaKey());
+        self::assertTrue($result['single']);
+        self::assertArrayHasKey('object_subtype', $result);
+        self::assertSame('page', $result['object_subtype']);
+        self::assertSame('string', $result['type']);
+        self::assertNull($result['default']);
+        self::assertArrayNotHasKey('sanitize_callback', $result);
     }
 
-    public function testCreatingMetaDataWithMetaKey(): void
+    public function testTermIncludesObjectSubtype(): void
     {
-        $expected = 'my_meta_key';
-        $data = MetaData::post('post_type_name', $expected, ObjectField::create());
+        $metaData = MetaData::term('category', 'color', StringField::create());
+        $result = $metaData->toArray();
 
-        self::assertSame($expected, $data->getMetaKey());
+        self::assertSame('term', $metaData->getObjectType());
+        self::assertArrayHasKey('object_subtype', $result);
+        self::assertSame('category', $result['object_subtype']);
     }
 
-    public function testCreatingMetaDataViaPostMethodSetsObjectTypeToPost(): void
+    public function testUserHasNoObjectSubtype(): void
     {
-        $data = MetaData::post('post_type_name', 'my_meta_key', ObjectField::create());
+        $metaData = MetaData::user('nickname', StringField::create());
+        $result = $metaData->toArray();
 
-        self::assertSame('post', $data->getObjectType());
+        self::assertSame('user', $metaData->getObjectType());
+        self::assertArrayNotHasKey('object_subtype', $result);
     }
 
-    public function testCreatingMetaDataWithPostTypeSetsObjectSubTypeToIt(): void
+    public function testCommentHasNoObjectSubtype(): void
     {
-        $expected = 'post_type_name';
-        $data = MetaData::post($expected, 'my_meta_key', ObjectField::create());
+        $metaData = MetaData::comment('rating', IntegerField::create());
+        $result = $metaData->toArray();
 
-        self::assertSame($expected, $data->toArray()['object_subtype']);
+        self::assertSame('comment', $metaData->getObjectType());
+        self::assertArrayNotHasKey('object_subtype', $result);
     }
 
-    public function testShowInRestGeneratesSchema(): void
+    public function testWithMultipleValue(): void
     {
-        $data = MetaData::post('post_type_name', 'my_meta_key', ObjectField::create())
-            ->withShowInRest();
+        $result = MetaData::user('tags', StringField::create())
+            ->withMultipleValue()
+            ->toArray();
 
-        $showInRest = $data->toArray()['show_in_rest'] ?? null;
-
-        self::assertIsArray($showInRest);
-        self::assertArrayHasKey('schema', $showInRest);
+        self::assertFalse($result['single']);
     }
 
-    public function testAuthCallbackIs(): void
+    public function testWithDescription(): void
     {
-        $callback = fn(): bool => true;
-        $data = MetaData::post('post_type_name', 'my_meta_key', ObjectField::create())
-            ->withAuthCallback($callback);
+        $result = MetaData::user('bio', StringField::create())
+            ->withDescription('The user biography.')
+            ->toArray();
 
-        $authCallback = $data->toArray()['auth_callback'] ?? null;
-
-        self::assertIsCallable($authCallback);
-        self::assertSame($callback, $authCallback);
+        self::assertArrayHasKey('description', $result);
+        self::assertSame('The user biography.', $result['description']);
     }
 
-    public function testIsSingleByDefault(): void
+    public function testDescriptionAbsentByDefault(): void
     {
-        $data = MetaData::post('post_type_name', 'my_meta_key', ObjectField::create());
+        $result = MetaData::user('bio', StringField::create())->toArray();
 
-        self::assertTrue($data->toArray()['single']);
+        self::assertArrayNotHasKey('description', $result);
     }
 
-    public function testWithMultipleValuesByDefaultSetSingleToFalse(): void
+    public function testWithShowInRestEmitsSchema(): void
     {
-        $data = MetaData::post('post_type_name', 'my_meta_key', ObjectField::create())
-            ->withMultipleValue();
-
-        self::assertFalse($data->toArray()['single']);
-    }
-
-    /**
-     * @dataProvider metaDataClonesCases
-     *
-     * @param callable(MetaData): MetaData $modify
-     */
-    public function testMetaDataClones(callable $modify): void
-    {
-        $original = MetaData::post('post_type_name', 'my_meta_key', ObjectField::create());
-
-        $modified = ($modify)($original);
-
-        self::assertNotSame($original, $modified);
-    }
-
-    /**
-     * @return iterable<string, array{callable(MetaData): MetaData}>
-     */
-    public static function metaDataClonesCases(): iterable
-    {
-        $cb = fn(): bool => true;
-        yield 'showInRest' => [fn(MetaData $data): MetaData => $data->withShowInRest()];
-        yield 'singleValue' => [fn(MetaData $data): MetaData => $data->withMultipleValue()];
-        yield 'authCallback' => [fn(MetaData $data): MetaData => $data->withAuthCallback($cb)];
-    }
-
-    public function testExpected(): void
-    {
-        $nextDecember = (new DateTimeImmutable('1st december'))->format('Y-m-d H:i:s');
-        $today = (new DateTimeImmutable())->format('Y-m-d H:i:s');
-        $redirectUrl = 'https://www.kaiseki.dev';
-        $authCallback = fn(): bool => true;
-        $dateFormat = StringFormat::DateTime;
-
-        $data = MetaData::post(
-            'advent_calendar_post_type',
-            'advent_calendar_meta_key',
-            ObjectField::create()
-                ->withAddedProperty('door_count', IntegerField::create(24)->withMinimum(1))
-                ->withAddedProperty('door_ids', ArrayField::create(IntegerField::create(), []))
-                ->withAddedProperty('door_permalink_prefix', StringField::create('day-'))
-                ->withAddedProperty('redirect_url', StringField::create($redirectUrl)->withFormat(StringFormat::Uri))
-                ->withAddedProperty(
-                    'settings',
-                    ObjectField::create()
-                        ->withAddedProperty('hide_future_door_images', BooleanField::create(false))
-                        ->withAddedProperty('hide_door_numbers', BooleanField::create(false))
-                        ->withAddedProperty('leave_past_doors_open', BooleanField::create(false))
-                        ->withAddedProperty('make_today_door_large', BooleanField::create(false))
-                        ->withAddedProperty('make_today_door_first', BooleanField::create(false))
-                        ->withAddedProperty('open_all_doors', BooleanField::create(false))
-                        ->withAddedProperty('randomize_door_order', BooleanField::create(false))
-                        ->withRequiredValue()
-                )
-                ->withAddedProperty('has_finished_setup', BooleanField::create(false))
-                ->withAddedProperty('has_activated_simulation_date', BooleanField::create(false))
-                ->withAddedProperty('calendar_simulation_date', StringField::create($today)->withFormat($dateFormat))
-                ->withAddedProperty('calendar_start_date', StringField::create($nextDecember)->withFormat($dateFormat))
-                ->withRequiredValue()
-        )
+        $result = MetaData::user('bio', StringField::create('x'))
             ->withShowInRest()
-            ->withAuthCallback($authCallback);
+            ->toArray();
 
-        self::assertSame(
-            [
-                'object_subtype' => 'advent_calendar_post_type',
-                'single' => true,
-                'default' => [
-                    'door_count' => 24,
-                    'door_ids' => [],
-                    'door_permalink_prefix' => 'day-',
-                    'redirect_url' => $redirectUrl,
-                    'settings' => [
-                        'hide_future_door_images' => false,
-                        'hide_door_numbers' => false,
-                        'leave_past_doors_open' => false,
-                        'make_today_door_large' => false,
-                        'make_today_door_first' => false,
-                        'open_all_doors' => false,
-                        'randomize_door_order' => false,
-                    ],
-                    'has_finished_setup' => false,
-                    'has_activated_simulation_date' => false,
-                    'calendar_simulation_date' => $today,
-                    'calendar_start_date' => $nextDecember,
-                ],
-                'type' => 'object',
-                'show_in_rest' => [
-                    'schema' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'door_count' => [
-                                'type' => 'integer',
-                                'minimum' => 1,
-                            ],
-                            'door_ids' => [
-                                'type' => 'array',
-                                'items' => [
-                                    'type' => 'integer',
-                                ],
-                            ],
-                            'door_permalink_prefix' => [
-                                'type' => 'string',
-                            ],
-                            'redirect_url' => [
-                                'type' => 'string',
-                                'format' => 'uri',
-                            ],
-                            'settings' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'hide_future_door_images' => ['type' => 'boolean'],
-                                    'hide_door_numbers' => ['type' => 'boolean'],
-                                    'leave_past_doors_open' => ['type' => 'boolean'],
-                                    'make_today_door_large' => ['type' => 'boolean'],
-                                    'make_today_door_first' => ['type' => 'boolean'],
-                                    'open_all_doors' => ['type' => 'boolean'],
-                                    'randomize_door_order' => ['type' => 'boolean'],
-                                ],
-                            ],
-                            'has_finished_setup' => [
-                                'type' => 'boolean',
-                            ],
-                            'has_activated_simulation_date' => ['type' => 'boolean'],
-                            'calendar_simulation_date' => [
-                                'type' => 'string',
-                                'format' => 'date-time',
-                            ],
-                            'calendar_start_date' => [
-                                'type' => 'string',
-                                'format' => 'date-time',
-                            ],
-                        ],
-                    ],
-                ],
-                'auth_callback' => $authCallback,
-            ],
-            $data->toArray()
-        );
+        self::assertArrayHasKey('show_in_rest', $result);
+        $showInRest = $result['show_in_rest'];
+        self::assertIsArray($showInRest);
+        self::assertSame(['type' => 'string'], $showInRest['schema']);
+    }
+
+    public function testShowInRestAbsentByDefault(): void
+    {
+        $result = MetaData::user('bio', StringField::create())->toArray();
+
+        self::assertArrayNotHasKey('show_in_rest', $result);
+    }
+
+    public function testWithAuthCallback(): void
+    {
+        $callback = static fn(): bool => true;
+        $result = MetaData::user('bio', StringField::create())
+            ->withAuthCallback($callback)
+            ->toArray();
+
+        self::assertArrayHasKey('auth_callback', $result);
+        self::assertSame($callback, $result['auth_callback']);
+    }
+
+    public function testAuthCallbackAbsentByDefault(): void
+    {
+        $result = MetaData::user('bio', StringField::create())->toArray();
+
+        self::assertArrayNotHasKey('auth_callback', $result);
+    }
+
+    public function testSanitizeCallbackAbsentByDefault(): void
+    {
+        $result = MetaData::user('count', IntegerField::create())->toArray();
+
+        self::assertArrayNotHasKey('sanitize_callback', $result);
+    }
+
+    public function testWithSanitizeCallbackOptsIn(): void
+    {
+        $callback = static fn(mixed $value): mixed => $value;
+        $result = MetaData::user('count', IntegerField::create())
+            ->withSanitizeCallback($callback)
+            ->toArray();
+
+        self::assertArrayHasKey('sanitize_callback', $result);
+        self::assertSame($callback, $result['sanitize_callback']);
     }
 }

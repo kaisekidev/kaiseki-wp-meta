@@ -29,14 +29,27 @@ final class MetaDataRegistryTest extends TestCase
         self::assertSame(10, has_action('init', [$registry, 'registerMeta']));
     }
 
-    public function testRegisterMetaCallsRegisterMetaFunction(): void
+    public function testRegisterMetaCallsRegisterMetaForEachMetaData(): void
     {
-        $builder = new DummyMetaDataBuilder([MetaData::post('post_type', 'meta_key', StringField::create())]);
+        $builder = new DummyMetaDataBuilder([
+            MetaData::post('post_type', 'meta_key', StringField::create()),
+            MetaData::user('user_key', StringField::create()),
+        ]);
         $registry = new MetaDataRegistry([$builder]);
 
-        Functions\expect('register_meta')->once();
+        /** @var list<string> $metaKeys */
+        $metaKeys = [];
+        Functions\when('register_meta')->alias(
+            static function (string $objectType, string $metaKey, array $args) use (&$metaKeys): bool {
+                $metaKeys[] = $metaKey;
+
+                return true;
+            }
+        );
 
         $registry->registerMeta();
+
+        self::assertSame(['meta_key', 'user_key'], $metaKeys);
     }
 
     protected function setUp(): void

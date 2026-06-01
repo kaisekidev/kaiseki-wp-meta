@@ -19,7 +19,7 @@ final class MetaDataRegistryFactoryTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    public function testFactory(): void
+    public function testFactoryResolvesBuildersFromConfigAndRegistersMeta(): void
     {
         $field = StringField::create()->withFormat(StringFormat::DateTime);
         $expected = MetaData::post('event', 'event_start_date', $field);
@@ -37,13 +37,23 @@ final class MetaDataRegistryFactoryTest extends TestCase
         );
         $instance = (new MetaDataRegistryFactory())($container);
 
-        Functions\expect('register_meta')->once()->with(
-            $expected->getObjectType(),
-            $expected->getMetaKey(),
-            $expected->toArray()
+        /** @var list<array{string, string, array<string, mixed>}> $calls */
+        $calls = [];
+        Functions\when('register_meta')->alias(
+            static function (string $objectType, string $metaKey, array $args) use (&$calls): bool {
+                $calls[] = [$objectType, $metaKey, $args];
+
+                return true;
+            }
         );
 
         $instance->registerMeta();
+
+        self::assertCount(1, $calls);
+        self::assertSame('post', $calls[0][0]);
+        self::assertSame('event_start_date', $calls[0][1]);
+        self::assertSame('event', $calls[0][2]['object_subtype']);
+        self::assertSame('string', $calls[0][2]['type']);
     }
 
     protected function setUp(): void

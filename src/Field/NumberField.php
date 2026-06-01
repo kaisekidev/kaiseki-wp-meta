@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace Kaiseki\WordPress\Meta\Field;
 
-use function is_float;
-
 /**
- * @extends AbstractNumericField<float>
+ * @extends AbstractNumericField<float|int>
  */
 final class NumberField extends AbstractNumericField
 {
     private const TYPE_NAME = 'number';
 
-    public static function create(?float $default = null): self
+    public static function create(int|float|null $default = null): self
     {
         return new self($default);
     }
@@ -21,10 +19,5 @@ final class NumberField extends AbstractNumericField
     public function getType(): string
     {
         return self::TYPE_NAME;
-    }
-
-    public function isValidValue(mixed $value): bool
-    {
-        return is_float($value);
     }
 }

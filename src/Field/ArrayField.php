@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace Kaiseki\WordPress\Meta\Field;
 
-use InvalidArgumentException;
-
-use function gettype;
-use function is_array;
-use function sprintf;
-
 /**
  * @phpstan-type ArrayFieldArray array{
  *      type: (string|array{string, string}),
@@ -22,45 +16,26 @@ use function sprintf;
 final class ArrayField extends AbstractField
 {
     private const TYPE_NAME = 'array';
-    private FieldInterface $arrayField;
     private ?int $minItems = null;
     private ?int $maxItems = null;
     private ?bool $uniqueItems = null;
 
     /**
-     * @param FieldInterface   $arrayField
+     * @param FieldInterface   $itemField
      * @param list<mixed>|null $default
      */
-    private function __construct(FieldInterface $arrayField, ?array $default = null)
+    private function __construct(private readonly FieldInterface $itemField, ?array $default = null)
     {
         parent::__construct($default);
-        $this->arrayField = $arrayField;
-        if ($default === null) {
-            return;
-        }
-
-        foreach ($default as $value) {
-            if ($this->arrayField->isValidValue($value)) {
-                continue;
-            }
-
-            throw new InvalidArgumentException(
-                sprintf(
-                    'ArrayField expects an array of %s, but contains %s',
-                    $this->arrayField->getType(),
-                    gettype($value)
-                )
-            );
-        }
     }
 
     /**
-     * @param FieldInterface   $arrayField
+     * @param FieldInterface   $itemField
      * @param list<mixed>|null $default
      */
-    public static function create(FieldInterface $arrayField, ?array $default = null): self
+    public static function create(FieldInterface $itemField, ?array $default = null): self
     {
-        return new self($arrayField, $default);
+        return new self($itemField, $default);
     }
 
     public function withMinItems(int $minItems): self
@@ -93,7 +68,7 @@ final class ArrayField extends AbstractField
     public function toArray(): array
     {
         $array = parent::toArray();
-        $array['items'] = $this->arrayField->withRequiredValue()->toArray();
+        $array['items'] = $this->itemField->toArray();
         if ($this->minItems !== null) {
             $array['minItems'] = $this->minItems;
         }
@@ -110,21 +85,5 @@ final class ArrayField extends AbstractField
     public function getType(): string
     {
         return self::TYPE_NAME;
-    }
-
-    public function isValidValue(mixed $value): bool
-    {
-        if (!is_array($value)) {
-            return false;
-        }
-        foreach ($value as $item) {
-            if ($this->arrayField->isValidValue($item)) {
-                continue;
-            }
-
-            return false;
-        }
-
-        return true;
     }
 }

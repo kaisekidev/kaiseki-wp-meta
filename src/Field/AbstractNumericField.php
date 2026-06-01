@@ -38,7 +38,7 @@ abstract class AbstractNumericField extends AbstractField
         return $new;
     }
 
-    public function withExcludedMinimum(): static
+    public function withExclusiveMinimum(): static
     {
         $new = clone $this;
         $new->exclusiveMinimum = true;
@@ -57,7 +57,7 @@ abstract class AbstractNumericField extends AbstractField
         return $new;
     }
 
-    public function withExcludedMaximum(): static
+    public function withExclusiveMaximum(): static
     {
         $new = clone $this;
         $new->exclusiveMaximum = true;

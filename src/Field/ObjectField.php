@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Kaiseki\WordPress\Meta\Field;
 
-use function array_key_exists;
 use function count;
-use function is_array;
+use function in_array;
 
 /**
  * @phpstan-type ObjectFieldArray array{
  *      type: string|array{string, string},
- *      properties: array<string, array<string, mixed>>,
+ *      additionalProperties: bool,
+ *      properties?: array<string, array<string, mixed>>,
  *      required?: list<string>
  * }
  */
@@ -22,25 +22,39 @@ final class ObjectField extends AbstractField
     private array $properties = [];
     /** @var list<string> */
     private array $requiredFieldNames = [];
+    private bool $additionalProperties = false;
 
     /**
-     * @param array<string, FieldInterface>|null $properties Array index will be used as name for property
+     * @param array<string, FieldInterface> $properties array key is used as the property name
      */
-    public static function create(?array $properties = null): self
+    public static function create(array $properties = []): self
     {
         $instance = new self();
-        $instance->properties = $properties ?? [];
+        $instance->properties = $properties;
 
         return $instance;
     }
 
-    public function withAddedProperty(string $name, FieldInterface $field, bool $required = false): self
+    public function withProperty(string $name, FieldInterface $field, bool $required = false): self
     {
         $clone = clone $this;
         $clone->properties[$name] = $field;
-        if ($required) {
+        if ($required && !in_array($name, $clone->requiredFieldNames, true)) {
             $clone->requiredFieldNames[] = $name;
         }
+
+        return $clone;
+    }
+
+    /**
+     * Allow keys beyond the declared properties (default: closed object).
+     *
+     * @param bool $allow
+     */
+    public function withAdditionalProperties(bool $allow = true): self
+    {
+        $clone = clone $this;
+        $clone->additionalProperties = $allow;
 
         return $clone;
     }
@@ -54,10 +68,14 @@ final class ObjectField extends AbstractField
         if (count($this->requiredFieldNames) > 0) {
             $array['required'] = $this->requiredFieldNames;
         }
-        $array['properties'] = [];
-        foreach ($this->properties as $name => $field) {
-            $array['properties'][$name] = $field->toArray();
+        if (count($this->properties) > 0) {
+            $properties = [];
+            foreach ($this->properties as $name => $field) {
+                $properties[$name] = $field->toArray();
+            }
+            $array['properties'] = $properties;
         }
+        $array['additionalProperties'] = $this->additionalProperties;
 
         return $array;
     }
@@ -67,33 +85,19 @@ final class ObjectField extends AbstractField
      */
     public function getDefault(): ?array
     {
+        if (count($this->properties) === 0) {
+            return null;
+        }
         $default = [];
         foreach ($this->properties as $name => $field) {
             $default[$name] = $field->getDefault();
         }
 
-        return count($default) > 0 ? $default : null;
+        return $default;
     }
 
     public function getType(): string
     {
         return self::TYPE_NAME;
-    }
-
-    public function isValidValue(mixed $value): bool
-    {
-        if (!is_array($value)) {
-            return false;
-        }
-        foreach ($value as $key => $arrayValue) {
-            if (!array_key_exists($key, $this->properties)) {
-                return false;
-            }
-            if (!$this->properties[$key]->isValidValue($arrayValue)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

@@ -7,39 +7,31 @@ namespace Kaiseki\WordPress\Meta\Field;
 abstract class AbstractField implements FieldInterface
 {
     private const NULLABLE_TYPE = 'null';
-    private bool $isRequired;
-    private mixed $default;
+    private bool $nullable = false;
 
-    protected function __construct(mixed $default = null)
+    protected function __construct(private readonly mixed $default = null)
     {
-        $this->isRequired = $default !== null;
-        $this->default = $default;
+    }
+
+    /**
+     * Allow `null` as a valid value. Independent of whether a default is set.
+     */
+    public function nullable(): static
+    {
+        $clone = clone $this;
+        $clone->nullable = true;
+
+        return $clone;
+    }
+
+    public function isNullable(): bool
+    {
+        return $this->nullable;
     }
 
     public function getDefault(): mixed
     {
         return $this->default;
-    }
-
-    public function withRequiredValue(): static
-    {
-        $clone = clone $this;
-        $clone->isRequired = true;
-
-        return $clone;
-    }
-
-    public function withOptionalValue(): static
-    {
-        $clone = clone $this;
-        $clone->isRequired = false;
-
-        return $clone;
-    }
-
-    public function isRequired(): bool
-    {
-        return $this->isRequired;
     }
 
     /**
@@ -48,7 +40,7 @@ abstract class AbstractField implements FieldInterface
     public function toArray(): array
     {
         return [
-            'type' => $this->isRequired ? $this->getType() : [$this->getType(), self::NULLABLE_TYPE],
+            'type' => $this->nullable ? [$this->getType(), self::NULLABLE_TYPE] : $this->getType(),
         ];
     }
 }
